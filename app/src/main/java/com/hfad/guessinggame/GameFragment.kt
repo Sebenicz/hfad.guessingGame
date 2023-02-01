@@ -5,9 +5,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.text.toUpperCase
 import androidx.lifecycle.ViewModelProvider
 import com.hfad.guessinggame.databinding.FragmentGameBinding
 import androidx.navigation.findNavController
+import androidx.lifecycle.Observer
 
 class GameFragment : Fragment() {
     private var _binding: FragmentGameBinding? = null
@@ -20,16 +22,26 @@ class GameFragment : Fragment() {
     ): View? {
         viewModel = ViewModelProvider(this).get(GameViewModel::class.java)
         _binding = FragmentGameBinding.inflate(inflater, container, false)
-        updateScreen()
+
+        viewModel.incorrectGuesses.observe(viewLifecycleOwner, Observer { //observe change and display it
+            newValue -> binding.incorrect.text = "Incorrect guesses: $newValue"
+        })
+
+        viewModel.livesLeft.observe(viewLifecycleOwner, Observer {
+            newValue -> binding.lives.text = "You have $newValue lives left"
+        })
+
+        viewModel.gameOver.observe(viewLifecycleOwner, Observer {
+            newValue ->
+                if (newValue) {
+                    val action = GameFragmentDirections.actionGameFragmentToResultFragment(viewModel.wonLostMessage())
+                    binding.root.findNavController().navigate(action)
+                }
+        })
 
         binding.guessButton.setOnClickListener {
             viewModel.makeGuess(binding.guess.text.toString().uppercase())
             binding.guess.text = null
-            updateScreen()
-            if(viewModel.isWon() || viewModel.isLost()){
-                val action = GameFragmentDirections.actionGameFragmentToResultFragment(viewModel.wonLostMessage())
-                binding.root.findNavController().navigate(action)
-            }
         }
         return binding.root
     }
@@ -37,16 +49,6 @@ class GameFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    fun updateScreen(){
-        binding.apply {
-            val mistakes = "Incorrect guesses: ${viewModel.incorrectGuesses}"
-            val livesText = "You have ${viewModel.livesLeft} lives left"
-            word.text = viewModel.secretWordDisplay
-            lives.text = livesText
-            incorrect.text = mistakes
-        }
     }
 
 }
