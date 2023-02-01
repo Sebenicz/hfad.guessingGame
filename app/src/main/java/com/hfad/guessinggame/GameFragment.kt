@@ -23,6 +23,10 @@ class GameFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(GameViewModel::class.java)
         _binding = FragmentGameBinding.inflate(inflater, container, false)
 
+        viewModel.secretWordDisplay.observe(viewLifecycleOwner, Observer {
+            newValue -> binding.word.text = newValue
+        })
+
         viewModel.incorrectGuesses.observe(viewLifecycleOwner, Observer { //observe change and display it
             newValue -> binding.incorrect.text = "Incorrect guesses: $newValue"
         })
