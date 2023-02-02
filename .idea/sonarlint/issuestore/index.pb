@@ -24,5 +24,3 @@ A
 gradle.properties,2/a/2afbb999f001938c88fa43fc2ef52abf0f8213e4
 <
 build.gradle,f/0/f07866736216be0ee2aba49e392191aeae700a35
-i
-9app/src/main/java/com/hfad/guessinggame/ResultFragment.kt,4/f/4f9eee94b03ccf4158f32419d899b307c8de6373
